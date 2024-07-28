@@ -5,8 +5,28 @@ branding:
   icon: 'activity'
   color: 'gray-dark'
 inputs:
-
+  pr_number:
+    description: "Pull request triggered the workflow"
+    required: true
+    type: number
+  draft:
+    description: "The release is a full release or a draft release"
+    type: boolean
+    required: false
+  prerelease:
+    description: "Release is latest or pre-release"
+    type: boolean
+    required: false
+  generate_release_notes:
+    description: "Auto generate release notes"
+    type: boolean
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
+  args:
+    - ${{ inputs.pr_number }}
+    - ${{ inputs.draft }}
+    - ${{ inputs.prerelease }}
+    - ${{ inputs.generate_release_notes }}
 
