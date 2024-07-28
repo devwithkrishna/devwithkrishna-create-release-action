@@ -1,0 +1,30 @@
+name: create-release
+on:
+  pull_request:
+    types:
+    - closed
+    branches:
+    - main
+run-name: creating release - Pull Request No - ${{ github.event.number }}
+jobs:
+  create-release-based-on-label:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Token generator
+      uses: githubofkrishnadhas/github-access-using-githubapp@v2
+      id: token-generation
+      with:
+        github_app_id: ${{ secrets.TOKEN_GENERATOR_APPID }}
+        github_app_private_key: ${{ secrets.TOKEN_GENERATOR_PRIVATE_KEY }}
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ steps.token-generation.outputs.token }}
+
+    - name: create-release
+      uses: devwithkrishna/devwithkrishna-create-release-action@main
+      with:
+        token: ${{ steps.token-generation.outputs.token }}
+        pr_number: ${{ github.event.number }}
+        generate_release_notes: true
