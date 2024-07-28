@@ -5,7 +5,7 @@ import argparse
 import sys
 from dotenv import load_dotenv
 from latest_release import get_latest_release_from_repo
-from get_label_from_pr import get_labels_of_a_pull_request, get_details_from_pull_request
+from get_label_from_pr import get_details_from_pull_request
 
 
 def generate_major_release_tag(major: str):
@@ -73,10 +73,8 @@ def process_previous_release_in_repository_and_get_new_release_tag(latest_releas
 	process previous tag and generate new tag for release
 	:return:
 	"""
-	major, minor, patch = split_latest_release_into_components(latest_release=latest_release)
-	print(f'Tag components from latest release are - major:{major} minor:{minor} patch:{patch}')
 	labels = pr_details['pull_request_labels']
-	looking_for_labels = ['major', 'minor', 'patch']
+	looking_for_labels = ['major', 'minor', 'patch','first-release']
 	found_labels = [label for label in looking_for_labels if label in labels]
 	if len(found_labels) > 1:
 		print(f"More than 1 label found simultaneously. PR labels are  {labels} and expected ones are only one among {looking_for_labels}")
@@ -84,10 +82,12 @@ def process_previous_release_in_repository_and_get_new_release_tag(latest_releas
 	elif not found_labels:
 		print(f"No relevant label found in PR. Expected one among {looking_for_labels} But found {labels}")
 		sys.exit(1)
-
 	print(f"Found label : {found_labels[0]}")
 
-	pr_label = found_labels[0] # zeroth index
+	pr_label = found_labels[0]  # zeroth index
+
+	major, minor, patch = split_latest_release_into_components(latest_release=latest_release)
+	print(f'Tag components from latest release are - major:{major} minor:{minor} patch:{patch}')
 
 	if pr_label == 'major':
 		new_release_tag = generate_major_release_tag(major=major)
@@ -95,6 +95,8 @@ def process_previous_release_in_repository_and_get_new_release_tag(latest_releas
 	elif pr_label == 'minor':
 		new_release_tag = generate_minor_release_tag(major=major, minor=minor)
 		print(f'Newer Release Tag will be {new_release_tag}')
+	elif pr_label == 'first-release':
+		new_release_tag = 'v1.0.0' # hardcode first release tag as v1.0.0
 	else:
 		new_release_tag = generate_patch_release_tag(major=major, minor=minor, patch=patch)
 		print(f'Newer Release Tag will be {new_release_tag}')
@@ -187,16 +189,21 @@ def main():
 	prerelease = args.prerelease
 	generate_release_notes = args.generate_release_notes
 
-	latest_release = get_latest_release_from_repo()
-	# latest_release = 'v1.2.9'
 	pull_request_details = get_details_from_pull_request(pr_number=pr_number)
+	labels_in_pr = pull_request_details['pull_request_labels']
+	if 'first-release' in labels_in_pr:
+		latest_release = 'v1.0.0'
+	else:
+		latest_release = get_latest_release_from_repo()
+
 	release_eligible = eligible_for_a_release_from_pull_request(pull_request_details=pull_request_details)
 	if release_eligible:
 		print(f'PR {pull_request_details["pull_request_number"]} is merged')
 		new_release_body = prepare_body_of_new_release(pull_request_details=pull_request_details)
 		new_release_tag = process_previous_release_in_repository_and_get_new_release_tag(latest_release=latest_release, pr_details=pull_request_details)
 		create_new_release_github(new_release_tag=new_release_tag, new_release_body=new_release_body, draft=draft, prerelease=prerelease, generate_release_notes=generate_release_notes)
-
+	else:
+		print(f'PR {pull_request_details["pull_request_number"]} is Not merged. Hence exiting')
 
 if __name__ == "__main__":
 	main()
