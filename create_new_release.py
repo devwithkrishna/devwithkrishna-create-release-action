@@ -1,6 +1,7 @@
 import os
 import requests
 import re
+import argparse
 import sys
 from dotenv import load_dotenv
 from latest_release import get_latest_release_from_repo
@@ -101,7 +102,7 @@ def process_previous_release_in_repository_and_get_new_release_tag(latest_releas
 	return new_release_tag
 
 
-def create_new_release_github(new_release_tag: str, new_release_body: str):
+def create_new_release_github(new_release_tag: str, new_release_body: str, draft: bool, prerelease: bool, generate_release_notes:bool):
 	"""
 	create a new release in github repo using rest api
 	:param new_release_tag:
@@ -116,12 +117,12 @@ def create_new_release_github(new_release_tag: str, new_release_body: str):
 	}
 	data = {
 		"tag_name": new_release_tag,
-		"target_commitish":"main",
+		"target_commitish": "main",
 		"name": new_release_tag,
 		"body": new_release_body,
-		"draft": False,
-		"prerelease": False,
-		"generate_release_notes": True
+		"draft": draft,
+		"prerelease": prerelease,
+		"generate_release_notes": generate_release_notes
 	}
 	response = requests.post(url=api_url, headers=headers, json=data)
 	if response.status_code == 201:
@@ -144,30 +145,59 @@ def prepare_body_of_new_release(pull_request_details: dict):
 	pr_closed_at = pull_request_details['pull_request_closed_at']
 	assignees_list = pull_request_details['pull_request_assignee']
 	commits_no = pull_request_details['total_commits']
+	merged = pull_request_details['pull_request_merged']
+
 	assignees = ', '.join(assignees_list) if assignees_list else 'None'
 
 	description = (
 		f"**Pull Request Title**: {title}\n\n"
 		f"**Pull Request URL**: [PR Link]({pr_url})\n\n"
 		f"**Opened By**: {pr_opened_by}\n\n"
+		f"**Merged**: {merged}\n\n"
 		f"**Description**: {pr_body}\n\n"
 		f"**Created At**: {pr_created_at}\n\n"
-		f"**Closed At**: {pr_closed_at}\n\n"
+		f"**Closed & Merged At**: {pr_closed_at}\n\n"
 		f"**Assignees**: {assignees}\n\n"
 		f"**Total Commits**: {commits_no}\n"
 	)
 
 	return description
 
+def eligible_for_a_release_from_pull_request(pull_request_details:dict):
+	"""
+	This fucntion checks whether the PR has been merged or not. if not merged not eligible to create a release
+	:return:
+	"""
+	release_eligible = pull_request_details['pull_request_merged']
+	return release_eligible
+
+
+
+
 def main():
 	"""to run code"""
 	load_dotenv()
+	parser = argparse.ArgumentParser("Arguments to create Github release action")
+	parser.add_argument("--pr_number", help="Pull request number merged to main branch", type=int, required=True)
+	parser.add_argument("--draft",default=False, help="To create a draft (unpublished) release", type=bool, required= False)
+	parser.add_argument("--prerelease",default=False, help="true to identify the release as a prerelease. false to identify the release as a full release", type=bool, required=False)
+	parser.add_argument("--generate_release_notes",default=False, help="Generate release notes", type=bool, required=False)
+
+	args = parser.parse_args()
+	pr_number = args.pr_number
+	draft = args.draft
+	prerelease = args.prerelease
+	generate_release_notes = args.generate_release_notes
+
 	latest_release = get_latest_release_from_repo()
 	# latest_release = 'v1.2.9'
-	pull_request_details = get_details_from_pull_request()
-	new_release_body = prepare_body_of_new_release(pull_request_details=pull_request_details)
-	new_release_tag = process_previous_release_in_repository_and_get_new_release_tag(latest_release=latest_release, pr_details=pull_request_details)
-	create_new_release_github(new_release_tag=new_release_tag, new_release_body=new_release_body)
+	pull_request_details = get_details_from_pull_request(pr_number=pr_number)
+	release_eligible = eligible_for_a_release_from_pull_request(pull_request_details=pull_request_details)
+	if release_eligible:
+		print(f'PR {pull_request_details["pull_request_number"]} is merged')
+		new_release_body = prepare_body_of_new_release(pull_request_details=pull_request_details)
+		new_release_tag = process_previous_release_in_repository_and_get_new_release_tag(latest_release=latest_release, pr_details=pull_request_details)
+		create_new_release_github(new_release_tag=new_release_tag, new_release_body=new_release_body, draft=draft, prerelease=prerelease, generate_release_notes=generate_release_notes)
 
 
 if __name__ == "__main__":

@@ -29,13 +29,13 @@ def get_labels_of_a_pull_request(labels: list):
 	return labels_list
 
 
-def get_details_from_pull_request():
+def get_details_from_pull_request(pr_number: int):
 	"""
 	get details from a PR in github
 	:return:
 	"""
 	github_repository = os.getenv('GITHUB_REPOSITORY') # The owner and repository name
-	pull = 2
+	pull: int = pr_number
 	api_url = f'https://api.github.com/repos/{github_repository}/pulls/{pull}'
 	headers = {
 		"Accept": "application/vnd.github+json",
@@ -68,6 +68,8 @@ def get_details_from_pull_request():
 	assignees_list = get_assignees_of_a_pull_request(response_json['assignees'])
 	pull_request_details['pull_request_assignee'] = assignees_list
 	labes_list = get_labels_of_a_pull_request(response_json['labels'])
+	pull_request_details['pull_request_merged'] = response_json['merged']
+	pull_request_details['pull_request_number'] = response_json['number']
 	pull_request_details['pull_request_labels'] = labes_list
 	pull_request_details['total_commits'] = response_json['commits']
 
@@ -80,7 +82,9 @@ def get_details_from_pull_request():
 def main():
 	"""To run the code"""
 	load_dotenv()
-	pull_request_details = get_details_from_pull_request()
+	get_details_from_pull_request()
+
+
 
 if __name__ =="__main__":
 	main()
