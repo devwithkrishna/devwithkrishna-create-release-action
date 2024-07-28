@@ -58,13 +58,11 @@ def get_details_from_pull_request(pr_number: int):
 		print(f'internal server error')
 	else:
 		print('Service unavailable')
-	pull_request_details = {}
-	pull_request_details['pull_request_title'] = response_json['title']
-	pull_request_details['pull_request_url'] = response_json['url']
-	pull_request_details['pull_request_opened_by'] = response_json['user']['login']
-	pull_request_details['pull_request_body'] = response_json['body']
-	pull_request_details['pull_request_created_at'] = response_json['created_at']
-	pull_request_details['pull_request_closed_at'] = response_json['closed_at']
+	pull_request_details = {'pull_request_title': response_json['title'], 'pull_request_url': response_json['url'],
+							'pull_request_opened_by': response_json['user']['login'],
+							'pull_request_body': response_json['body'],
+							'pull_request_created_at': response_json['created_at'],
+							'pull_request_closed_at': response_json['closed_at']}
 	assignees_list = get_assignees_of_a_pull_request(response_json['assignees'])
 	pull_request_details['pull_request_assignee'] = assignees_list
 	labes_list = get_labels_of_a_pull_request(response_json['labels'])
@@ -73,9 +71,6 @@ def get_details_from_pull_request(pr_number: int):
 	pull_request_details['pull_request_labels'] = labes_list
 	pull_request_details['total_commits'] = response_json['commits']
 
-	# # Convert dictionary to JSON string and print it
-	# pull_request_details_json = json.dumps(pull_request_details, indent=4)
-	# print(pull_request_details_json)
 	return pull_request_details
 
 

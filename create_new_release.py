@@ -172,8 +172,6 @@ def eligible_for_a_release_from_pull_request(pull_request_details:dict):
 	return release_eligible
 
 
-
-
 def main():
 	"""to run code"""
 	load_dotenv()
