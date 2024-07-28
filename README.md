@@ -23,7 +23,7 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 ```markdown
     - name: create-release
-      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.0
+      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.1
       with:
         token: <your token reference here>
         pr_number: ${{ github.event.number }} #this will be passed from workflow 
@@ -72,7 +72,7 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 ```markdown
 - name: create-release
-      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.0
+      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.1
       with:
         token: ${{ secrets.TOKEN }}
         pr_number: ${{ github.event.number }} #this will be passed from workflow 
@@ -83,7 +83,7 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 ```markdown
 - name: create-release
-      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.0
+      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.1
       with:
         token: ${{ secrets.TOKEN }}
         pr_number: ${{ github.event.number }} #this will be passed from workflow 
@@ -95,7 +95,7 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 ```markdown
     - name: create-release
-      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.0
+      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.1
       with:
         token: ${{ secrets.TOKEN }}
         pr_number: ${{ github.event.number }}
@@ -131,7 +131,7 @@ jobs:
         github_app_private_key : ${{ secrets.PRIVATE_KEY }}
 
     - name: create-release
-      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.0
+      uses: devwithkrishna/devwithkrishna-create-release-action@v1.0.1
       with:
         token: ${{ steps.token-generation.outputs.token }}
         pr_number: ${{ github.event.number }}
