@@ -1,0 +1,12 @@
+name: "Create a GitHub Release Based on Specific Labels on a Pull Request"
+description: "GitHub Action for creating a Release"
+author: "githubofkrishnadhas"
+branding:
+  icon: 'activity'
+  color: 'gray-dark'
+inputs:
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+
