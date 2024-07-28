@@ -16,17 +16,15 @@ export GH_TOKEN="$token"
 # Build the command based on available parameters
 CMD="poetry run python3 /app/create_new_release.py --pr_number \"$pr_number\""
 
-
-if [ -n "$draft" ]; then
-    CMD="$CMD --draft \"$draft\""
+# Add optional arguments if they are provided
+if [ "$draft" = "true" ]; then
+  CMD="$CMD --draft"
 fi
-
-if [ -n "$prerelease" ]; then
-    CMD="$CMD --prerelease \"$prerelease\""
+if [ "$prerelease" = "true" ]; then
+  CMD="$CMD --prerelease"
 fi
-
-if [ -n "$generate_release_notes" ]; then
-    CMD="$CMD --generate_release_notese \"$generate_release_notes\""
+if [ "$generate_release_notes" = "true" ]; then
+  CMD="$CMD --generate_release_notes"
 fi
 
 # Print and execute the command
