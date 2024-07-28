@@ -23,6 +23,8 @@ def get_latest_release_from_repo():
 		# print(response_json)
 		latest_release_tag = response_json['tag_name']
 		print(f'Latest release tag on {github_repository} is {latest_release_tag}')
+	elif response.status_code == 404:
+		latest_release_tag = []
 
 	return latest_release_tag
 
