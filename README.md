@@ -7,12 +7,12 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 # Input arguments
 
-| Input name | Description                                     | Required           | Default value    |
-|------------|-------------------------------------------------|--------------------|------------------|
-| token | GitHub access token                             | :heavy_cehck_mark: | No default value | 
-|pr_number | Pull request number triggered the workflow      | :heavy_cehck_mark: | No default value |
-| draft | draft release or not. Boolean value             | ❌                  | Default - false |
-| prerelease | Release is latest or pre-release. Boolean value | ❌ | Default - false |
+| Input name             | Description                                     | Required           | Default value    |
+|------------------------|-------------------------------------------------|--------------------|------------------|
+| token                  | GitHub access token                             | :heavy_cehck_mark: | No default value | 
+| pr_number              | Pull request number triggered the workflow      | :heavy_cehck_mark: | No default value |
+| draft                  | draft release or not. Boolean value             | ❌                  | Default - false |
+| prerelease             | Release is latest or pre-release. Boolean value | ❌ | Default - false |
 | generate_release_notes | Auto generate release notes. Boolean value      | ❌ | Default - false |
 
 * Draft parameter and prerelease can not be used at same time. Either one can be used at a time.
@@ -48,7 +48,7 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 * This is specifically designed for Github usecase in which a Pull request is raised to merge a change from `Non main branch` to `main branch`
 
-* Expects a Specific label in PR. label should be one among `major`, `minor`, `patch` (case sensitive). only one among these.
+* Expects a Specific label in PR. label should be one among `first-release`, `major`, `minor`, `patch` (case sensitive). only one among these.
 
 * When PR is merged to main branch and finds one among above lables, based on label it creates a new tag and generates the release
 
@@ -56,7 +56,9 @@ Please refer to the [release](https://github.com/devwithkrishna/devwithkrishna-c
 
 * A PR should be merged to main branch to generate a release.
 
-* You can have n number of labels on PR. But for this to work one from `major`, `minor`, `patch` should be present and only one.
+* You can have n number of labels on PR. But for this to work one from `first-release`, `major`, `minor`, `patch` should be present and only one.
+
+* If the label `first-release` is found the release version will be `v1.0.0`. first release should only be used one time to create the first release version.
 
 * If it finds `major` label, this will increase the major version by 1 and `resets patch and minor components`
 
@@ -135,4 +137,3 @@ jobs:
         pr_number: ${{ github.event.number }}
         generate_release_notes: true
 ```
-
